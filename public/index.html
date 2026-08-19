@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planner Semanal - Tarefas que Fluem</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --bg: #ffffff;
+      --bg-light: #f9fafb;
+      --radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #3b82f6;
+        --primary-light: #1e3a8a;
+        --success: #22c55e;
+        --success-light: #1b4332;
+        --warning: #f59e0b;
+        --warning-light: #78350f;
+        --danger: #ef4444;
+        --danger-light: #7f1d1d;
+        --text-primary: #f3f4f6;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --border: #374151;
+        --bg: #111827;
+        --bg-light: #1f2937;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-light);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .week-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .day-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .day-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .day-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .day-date {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .day-tasks-count {
+      font-size: 0.75rem;
+      background: var(--warning);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .form-section {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-actions button {
+      padding: 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .form-actions button:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .form-actions button.cancel {
+      background: var(--bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .tasks-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-item {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: all 0.2s;
+    }
+
+    .task-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .task-item.completed {
+      opacity: 0.6;
+      border-color: var(--success);
+    }
+
+    .task-item.pending {
+      border-left: 3px solid var(--warning);
+    }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--success);
+    }
+
+    .task-content {
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .task-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .task-actions button {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .task-actions button:hover {
+      background: var(--bg);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .error {
+      background: var(--danger-light);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      }
+
+      .form-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 Planner Semanal</h1>
+      <p class="tagline">Tarefas que fluem para a próxima semana</p>
+    </header>
+
+    <div class="controls">
+      <button onclick="previousWeek()">← Semana Anterior</button>
+      <button onclick="goToToday()">Hoje</button>
+      <button onclick="nextWeek()">Próxima Semana →</button>
+    </div>
+
+    <div class="week-title" id="weekTitle"></div>
+
+    <div class="week-grid" id="weekGrid"></div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="form-section">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Título da tarefa</label>
+          <input type="text" id="taskTitle" placeholder="Ex: Reunião com cliente, Finalizar relatório">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="taskDate">
+          </div>
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="taskCategory">
+              <option value="trabalho">💼 Trabalho</option>
+              <option value="pessoal">👤 Pessoal</option>
+              <option value="saude">❤️ Saúde</option>
+              <option value="estudo">📚 Estudo</option>
+              <option value="outro">📌 Outro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button onclick="addTask()">+ Adicionar tarefa</button>
+        <button class="cancel" onclick="clearForm()">Limpar</button>
+      </div>
+    </div>
+
+    <div class="tasks-section">
+      <h2 class="section-title">📅 Semana Atual</h2>
+      <div class="task-list" id="currentWeekTasks"></div>
+    </div>
+
+    <div class="tasks-section">
+      <h2 class="section-title">⏰ Próximas Semanas</h2>
+      <div class="task-list" id="futureTasks"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin;
+    let currentDate = new Date();
+    let tasks = [];
+
+    async function fetchTasks() {
+      try {
+        const response = await fetch(`${API_URL}/api/tasks`);
+        tasks = await response.json();
+        render();
+      } catch (error) {
+        console.error('Erro ao carregar tarefas:', error);
+      }
+    }
+
+    async function addTask() {
+      const title = document.getElementById('taskTitle').value.trim();
+      const date = document.getElementById('taskDate').value;
+      const category = document.getElementById('taskCategory').value;
+
+      if (!title || !date) {
+        alert('Preencha título e data');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, date, category })
+        });
+
+        if (response.ok) {
+          clearForm();
+          fetchTasks();
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar tarefa:', error);
+      }
+    }
+
+    async function toggleTask(id, completed) {
+      try {
+        await fetch(`${API_URL}/api/tasks/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed })
+        });
+        fetchTasks();
+      } catch (error) {
+        console.error('Erro ao atualizar tarefa:', error);
+      }
+    }
+
+    async function deleteTask(id) {
+      if (!confirm('Tem certeza que deseja deletar esta tarefa?')) return;
+
+      try {
+        await fetch(`${API_URL}/api/tasks/${id}`, { method: 'DELETE' });
+        fetchTasks();
+      } catch (error) {
+        console.error('Erro ao deletar tarefa:', error);
+      }
+    }
+
+    async function postponeTask(id) {
+      try {
+        await fetch(`${API_URL}/api/tasks/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'postpone' })
+        });
+        fetchTasks();
+      } catch (error) {
+        console.error('Erro ao adiar tarefa:', error);
+      }
+    }
+
+    function clearForm() {
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskDate').value = '';
+      document.getElementById('taskCategory').value = 'trabalho';
+    }
+
+    function getWeekDates() {
+      const start = new Date(currentDate);
+      start.setDate(start.getDate() - start.getDay() + 1);
+
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
+      }
+      return dates;
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+    }
+
+    function previousWeek() {
+      currentDate.setDate(currentDate.getDate() - 7);
+      render();
+    }
+
+    function nextWeek() {
+      currentDate.setDate(currentDate.getDate() + 7);
+      render();
+    }
+
+    function goToToday() {
+      currentDate = new Date();
+      render();
+    }
+
+    function getCategoryEmoji(cat) {
+      const emojis = {
+        trabalho: '💼',
+        pessoal: '👤',
+        saude: '❤️',
+        estudo: '📚',
+        outro: '📌'
+      };
+      return emojis[cat] || '📌';
+    }
+
+    function render() {
+      const weekDates = getWeekDates();
+      const weekStart = new Date(weekDates[0]);
+      const weekEnd = new Date(weekDates[6]);
+
+      const startStr = weekStart.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+      const endStr = weekEnd.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+      document.getElementById('weekTitle').textContent = `Semana de ${startStr} – ${endStr}`;
+
+      // Renderizar dias da semana
+      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+      document.getElementById('weekGrid').innerHTML = weekDates.map((date, i) => {
+        const dayTasks = tasks.filter(t => t.date === date && !t.completed).length;
+        return `
+          <div class="day-card">
+            <div class="day-name">${days[new Date(date).getDay()]}</div>
+            <div class="day-date">${new Date(date).getDate()}</div>
+            ${dayTasks > 0 ? `<div class="day-tasks-count">${dayTasks} tarefas</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Estatísticas
+      const weekTasks = tasks.filter(t => {
+        const taskDate = new Date(t.date);
+        const weekStart = new Date(weekDates[0]);
+        const weekEnd = new Date(weekDates[6]);
+        return taskDate >= weekStart && taskDate <= weekEnd;
+      });
+
+      const completed = weekTasks.filter(t => t.completed).length;
+      const pending = weekTasks.filter(t => !t.completed).length;
+
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${weekTasks.length}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${completed}</div>
+          <div class="stat-label">Concluídas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${pending}</div>
+          <div class="stat-label">Pendentes</div>
+        </div>
+      `;
+
+      // Tarefas da semana atual
+      const currentWeekTasks = tasks
+        .filter(t => {
+          const taskDate = new Date(t.date);
+          const weekStart = new Date(weekDates[0]);
+          const weekEnd = new Date(weekDates[6]);
+          return taskDate >= weekStart && taskDate <= weekEnd;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      document.getElementById('currentWeekTasks').innerHTML = currentWeekTasks.length === 0
+        ? '<div class="empty-state"><div class="empty-state-icon">✨</div><p>Nenhuma tarefa esta semana</p></div>'
+        : currentWeekTasks.map(task => `
+          <div class="task-item ${task.completed ? 'completed' : 'pending'}">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
+              onchange="toggleTask('${task.id}', this.checked)">
+            <div class="task-content">
+              <div class="task-title">${task.title}</div>
+              <div class="task-meta">
+                <span>${formatDate(task.date)}</span>
+                <span>${getCategoryEmoji(task.category)} ${task.category}</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              ${!task.completed ? `<button onclick="postponeTask('${task.id}')">⏭️ Adiar</button>` : ''}
+              <button onclick="deleteTask('${task.id}')">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+
+      // Tarefas futuras
+      const futureTasks = tasks
+        .filter(t => new Date(t.date) > new Date(weekDates[6]))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 10);
+
+      document.getElementById('futureTasks').innerHTML = futureTasks.length === 0
+        ? '<div class="empty-state"><p>Nenhuma tarefa agendada</p></div>'
+        : futureTasks.map(task => `
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
+              onchange="toggleTask('${task.id}', this.checked)">
+            <div class="task-content">
+              <div class="task-title">${task.title}</div>
+              <div class="task-meta">
+                <span>${formatDate(task.date)}</span>
+                <span>${getCategoryEmoji(task.category)} ${task.category}</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button onclick="deleteTask('${task.id}')">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+
+      // Setar data padrão para hoje
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('taskDate').value = today;
+    }
+
+    // Inicializar
+    fetchTasks();
+    setInterval(fetchTasks, 30000); // Atualizar a cada 30 segundos
+  </script>
+</body>
+</html>
